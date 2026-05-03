@@ -2,16 +2,19 @@ from board import Board
 from position import Position
 from figure import Figure
 from player import Player
+from renderers.console_renderer import ConsoleRenderer
+from renderers.renderer import Renderer
 
 
 class Play:
-    def __init__(self, is_bottom_white):
+    def __init__(self, is_bottom_white, renderer: Renderer | None = None):
         """Bottom player is the first player, think of it
         as chessboard when bottom player is you always
         """
         self.bottom_player = Player(is_bottom_white)
         self.top_player = Player(not is_bottom_white)
         self.current_player = self.bottom_player
+        self.renderer = renderer or ConsoleRenderer()
 
         # Create bord
         self.board = Board()
@@ -42,6 +45,11 @@ class Play:
 
         for x in range(8):
             self.board[Position(x, 1)] = Figure("pawn", is_bottom_white)
-        for i in range(8):
-            self.board[Position(x, 7)] = Figure("pawn", is_bottom_white)
-        print(self.board)
+        for x in range(8):
+            self.board[Position(x, 6)] = Figure("pawn", not is_bottom_white)
+        self.renderer.display_board(self.board)
+
+    def move(self, from_pos: Position, to_pos: Position):
+        self.board[to_pos] = self.board[from_pos]
+        self.board[from_pos] = None
+        self.renderer.display_board(self.board)
